@@ -34,6 +34,13 @@ public class MyRealm extends AuthorizingRealm{
 	private MenuDao menuDao;
 
 	/**
+	 * 任钦利git测试master/现在是dev/test/rqltest
+	 */
+	public void testGitHub(){
+
+	}
+
+	/**
 	 * 角色授权
 	 */
 	@Override
