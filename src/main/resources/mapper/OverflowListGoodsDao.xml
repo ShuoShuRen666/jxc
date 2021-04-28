@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.jxc.dao.OverflowListGoodsDao">
+
+    <resultMap id="OverflowListGoodsMap" type="com.atguigu.jxc.entity.OverflowListGoods">
+        <id column="overflow_list_goods_id" property="overflowListGoodsId"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_code" property="goodsCode"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_model" property="goodsModel"/>
+        <result column="goods_unit" property="goodsUnit"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="price" property="price"/>
+        <result column="total" property="total"/>
+        <result column="overflow_list_id" property="overflowListId"/>
+        <result column="goods_type_id" property="goodsTypeId"/>
+    </resultMap>
+
+    <insert id="insertOverflowListGoods">
+        insert into t_overflow_list_goods
+        (goods_id,goods_code,goods_name,goods_model,goods_unit,goods_num,price,total,overflow_list_id,goods_type_id)
+        values
+        <foreach collection="list" item="OverflowListGoods" separator=",">
+            (
+             #{OverflowListGoods.goodsId},
+             #{OverflowListGoods.goodsCode},
+             #{OverflowListGoods.goodsName},
+             #{OverflowListGoods.goodsModel},
+             #{OverflowListGoods.goodsUnit},
+             #{OverflowListGoods.goodsNum},
+             #{OverflowListGoods.price},
+             #{OverflowListGoods.total},
+             #{overflowListId},
+             #{OverflowListGoods.goodsTypeId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectGoodsList" resultMap="OverflowListGoodsMap">
+        select overflow_list_goods_id,
+               goods_id,
+               goods_code,
+               goods_name,
+               goods_model,
+               goods_unit,
+               goods_num,
+               price,
+               total,
+               overflow_list_id,
+               goods_type_id
+        from t_overflow_list_goods
+        where overflow_list_id = #{overflowListId}
+    </select>
+</mapper>

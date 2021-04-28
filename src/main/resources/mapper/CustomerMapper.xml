@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.jxc.dao.CustomerDao">
+    <resultMap id="CustomerBaseMap" type="com.atguigu.jxc.entity.Customer">
+        <id property="customerId" column="customer_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="contacts" column="contacts"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="address" column="address"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+    <insert id="save">
+        insert into t_customer (customer_name,contacts,phone_number,address,remarks)
+        values(#{customerName},#{contacts},#{phoneNumber},#{address},#{remarks})
+    </insert>
+
+    <update id="updateById">
+        update t_customer
+        set customer_name = #{customerName},
+            contacts = #{contacts},
+            phone_number = #{phoneNumber},
+            address = #{address},
+            remarks = #{remarks}
+        where customer_id = #{customerId}
+    </update>
+
+    <delete id="deleteByIds">
+        delete from t_customer
+        <where>
+            customer_id in
+            <foreach collection="idArr" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+
+    <select id="pageList" resultMap="CustomerBaseMap">
+        SELECT
+            customer_id,
+            customer_name,
+            contacts,
+            phone_number,
+            address,
+            remarks
+        FROM
+            t_customer
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat("%",#{customerName},"%")
+            </if>
+        </where>
+        limit #{page},#{rows}
+    </select>
+
+    <select id="getCustomerCount" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM t_customer
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat("%",#{customerName},"%")
+            </if>
+        </where>
+    </select>
+</mapper>

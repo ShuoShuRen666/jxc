@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.jxc.dao.UnitDao">
+    <resultMap id="UnitBaseMap" type="com.atguigu.jxc.entity.Unit">
+        <id property="unitId" column="unit_id"/>
+        <result property="unitName" column="unit_name"/>
+    </resultMap>
+
+    <select id="selectUnitList" resultMap="UnitBaseMap">
+        select unit_id,unit_name
+            from t_unit
+    </select>
+</mapper>

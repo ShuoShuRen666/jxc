@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.jxc.dao.DamageListDao">
+    <resultMap id="damageListMap" type="com.atguigu.jxc.entity.DamageList">
+        <id column="damage_list_id" property="damageListId"/>
+        <result column="damage_number" property="damageNumber"/>
+        <result column="damage_date" property="damageDate"/>
+        <result column="remarks" property="remarks"/>
+        <result column="user_id" property="userId"/>
+        <result column="true_name" property="trueName"/>
+    </resultMap>
+
+    <insert id="insertDamageList" useGeneratedKeys="true" keyProperty="damageListId"  keyColumn="damage_list_id">
+        insert into t_damage_list (remarks,damage_date,damage_number,user_id)
+                            values (#{remarks},#{damageDate},#{damageNumber},#{userId})
+    </insert>
+
+    <select id="selectListByTime" resultMap="damageListMap">
+        select tdl.damage_list_id,
+               tdl.damage_number,
+               tdl.damage_date,
+               tdl.remarks,
+               tdl.user_id,
+               tu.true_name
+        from t_damage_list tdl left join t_user tu
+            on tdl.user_id = tu.user_id
+        where tdl.damage_date between #{sTime} and #{eTime}
+    </select>
+</mapper>

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.jxc.dao.GoodsDao">
+    <resultMap id="GoodsMap" type="com.atguigu.jxc.entity.Goods">
+        <id property="goodsId" column="goods_id"/>
+        <result property="goodsCode" column="goods_code"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="inventoryQuantity" column="inventory_quantity"/>
+        <result property="lastPurchasingPrice" column="last_purchasing_price"/>
+        <result property="minNum" column="min_num"/>
+        <result property="goodsModel" column="goods_model"/>
+        <result property="goodsProducer" column="goods_producer"/>
+        <result property="purchasingPrice" column="purchasing_price"/>
+        <result property="remarks" column="remarks"/>
+        <result property="sellingPrice" column="selling_price"/>
+        <result property="state" column="state"/>
+        <result property="goodsUnit" column="goods_unit"/>
+        <result property="goodsTypeId" column="goods_type_id"/>
+        <result property="goodsTypeName" column="goods_type_name"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into t_goods (goods_type_id,
+                             goods_code,
+                             goods_name,
+                             goods_model,
+                             goods_unit,
+                             purchasing_price,
+                             selling_price,
+                             min_num,
+                             goods_producer,
+                             remarks,
+                             inventory_quantity,
+                             last_purchasing_price,
+                             state)
+        values (#{goodsTypeId},
+                #{goodsCode},
+                #{goodsName},
+                #{goodsModel},
+                #{goodsUnit},
+                #{purchasingPrice},
+                #{sellingPrice},
+                #{minNum},
+                #{goodsProducer},
+                #{remarks},
+                0,
+                0,
+                0)
+    </insert>
+
+    <update id="updateStock">
+        update t_goods
+        set inventory_quantity = #{inventoryQuantity},
+            purchasing_price = #{purchasingPrice}
+        where goods_id = #{goodsId}
+    </update>
+
+    <update id="update">
+        update t_goods
+        set goods_type_id = #{goodsTypeId},
+            goods_code = #{goodsCode},
+            goods_name = #{goodsName},
+            goods_model = #{goodsModel},
+            goods_unit = #{goodsUnit},
+            purchasing_price = #{purchasingPrice},
+            selling_price = #{sellingPrice},
+            min_num = #{minNum},
+            goods_producer = #{goodsProducer},
+            remarks = #{remarks},
+            inventory_quantity = 0,
+            last_purchasing_price = 0,
+            state = 0
+        where goods_id = #{goodsId}
+    </update>
+
+    <delete id="delete">
+        delete from t_goods where goods_id = #{goodsId}
+    </delete>
+
+    <update id="deleteStock">
+        update t_goods set inventory_quantity = 0
+        where goods_id = #{goodsId}
+    </update>
+
+    <select id="getMaxCode" resultType="java.lang.String">
+        SELECT
+            MAX( goods_code )
+        FROM
+            t_goods
+    </select>
+
+    <select id="selectListInventoryByPage" resultMap="GoodsMap">
+        SELECT
+            tGoods.goods_id,
+            tGoods.goods_code,
+            tGoods.goods_name,
+            tGoods.inventory_quantity,
+            tGoods.last_purchasing_price,
+            tGoods.min_num,
+            tGoods.goods_model,
+            tGoods.goods_producer,
+            tGoods.purchasing_price,
+            tGoods.remarks,
+            tGoods.selling_price,
+            tGoods.state,
+            tGoods.goods_unit,
+            tGoods.goods_type_id,
+            tGoodsType.goods_type_name
+        FROM
+            t_goods tGoods
+                LEFT JOIN t_goods_type tGoodsType ON tGoods.goods_type_id = tGoodsType.goods_type_id
+            <where>
+                <if test="codeOrName != null and codeOrName != ''">
+                    AND
+                        (
+                        tGoods.goods_name like concat('%', #{codeOrName}, '%') OR
+                        tGoods.goods_code like concat('%', #{codeOrName}, '%')
+                        )
+                </if>
+                <if test="goodsTypeId != null and goodsTypeId != 1">
+                    AND
+                        (
+                        tGoods.goods_type_id = #{goodsTypeId} or
+                        tGoodsType.p_id = #{goodsTypeId}
+                        )
+                </if>
+            </where>
+            LIMIT #{page},#{rows}
+
+    </select>
+
+    <select id="getGoodsInventoryCount" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            t_goods tGoods
+                LEFT JOIN t_goods_type tGoodsType ON tGoods.goods_type_id = tGoodsType.goods_type_id
+        <where>
+            <if test="codeOrName != null and codeOrName != ''">
+                and (
+                    tGoods.goods_name like concat('%',#{codeOrName},'%')or
+                    tGoods.goods_code like concat('%',#{codeOrName},'%')
+                    )
+            </if>
+            <if test="goodsTypeId != null and goodsTypeId != 1">
+                and (
+                    tGoods.goods_type_id = #{goodsTypeId} or
+                    tGoodsType.p_id = #{goodsTypeId}
+                    )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectGoodsState" resultType="java.lang.Integer">
+        select state
+        from t_goods
+        where goods_id = #{goodsId}
+    </select>
+
+    <select id="selectNoInventoryQuantity" resultMap="GoodsMap">
+        SELECT
+            tGoods.goods_id,
+            tGoods.goods_code,
+            tGoods.goods_name,
+            tGoods.inventory_quantity,
+            tGoods.last_purchasing_price,
+            tGoods.min_num,
+            tGoods.goods_model,
+            tGoods.goods_producer,
+            tGoods.purchasing_price,
+            tGoods.remarks,
+            tGoods.selling_price,
+            tGoods.state,
+            tGoods.goods_unit,
+            tGoods.goods_type_id,
+            tGoodsType.goods_type_name
+        FROM
+            t_goods tGoods
+                LEFT JOIN t_goods_type tGoodsType ON tGoods.goods_type_id = tGoodsType.goods_type_id
+        <where>
+            and tGoods.inventory_quantity = 0
+            <if test="nameOrCode != null and nameOrCode != ''">
+                and (
+                    tGoods.goods_name like concat("%",#{nameOrCode},"%") or
+                    tGoods.goods_code like concat("%",#{nameOrCode},"%")
+                    )
+            </if>
+        </where>
+        limit #{page},#{rows}
+    </select>
+
+    <select id="getGoodsInventoryCountByCodeOrName" resultType="java.lang.Integer">
+        select
+            count(*)
+        from t_goods
+        <where>
+            and inventory_quantity = 0
+            <if test="codeOrName != null and codeOrName != ''">
+                and (
+                    goods_name like concat("%",#{codeOrName},"%") or
+                    goods_code like concat("%",#{codeOrName},"%")
+                    )
+            </if>
+        </where>
+    </select>
+
+    <select id="getHasInventoryQuantity" resultMap="GoodsMap">
+        SELECT
+        tGoods.goods_id,
+        tGoods.goods_code,
+        tGoods.goods_name,
+        tGoods.inventory_quantity,
+        tGoods.last_purchasing_price,
+        tGoods.min_num,
+        tGoods.goods_model,
+        tGoods.goods_producer,
+        tGoods.purchasing_price,
+        tGoods.remarks,
+        tGoods.selling_price,
+        tGoods.state,
+        tGoods.goods_unit,
+        tGoods.goods_type_id,
+        tGoodsType.goods_type_name
+        FROM
+        t_goods tGoods
+        LEFT JOIN t_goods_type tGoodsType ON tGoods.goods_type_id = tGoodsType.goods_type_id
+        <where>
+            and tGoods.inventory_quantity != 0
+            <if test="nameOrCode != null and nameOrCode != ''">
+                and (
+                tGoods.goods_name like concat("%",#{nameOrCode},"%") or
+                tGoods.goods_code like concat("%",#{nameOrCode},"%")
+                )
+            </if>
+        </where>
+        limit #{offSet},#{rows}
+    </select>
+
+    <select id="getGoodsInventoryCountByCodeOrNameHasStock" resultType="java.lang.Integer">
+        select
+        count(*)
+        from t_goods
+        <where>
+            and inventory_quantity != 0
+            <if test="nameOrCode != null and nameOrCode != ''">
+                and (
+                goods_name like concat("%",#{nameOrCode},"%") or
+                goods_code like concat("%",#{nameOrCode},"%")
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectListAlarm" resultMap="GoodsMap">
+        SELECT
+            tGoods.goods_id,
+            tGoods.goods_code,
+            tGoods.goods_name,
+            tGoods.inventory_quantity,
+            tGoods.last_purchasing_price,
+            tGoods.min_num,
+            tGoods.goods_model,
+            tGoods.goods_producer,
+            tGoods.purchasing_price,
+            tGoods.remarks,
+            tGoods.selling_price,
+            tGoods.state,
+            tGoods.goods_unit,
+            tGoods.goods_type_id,
+            tGoodsType.goods_type_name
+        FROM
+            t_goods tGoods
+                LEFT JOIN t_goods_type tGoodsType ON tGoods.goods_type_id = tGoodsType.goods_type_id
+        where
+            tGoods.inventory_quantity &lt; tGoods.min_num
+    </select>
+
+
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.jxc.dao.OverflowListDao">
+    <resultMap id="OverflowListMap" type="com.atguigu.jxc.entity.OverflowList">
+        <id column="overflow_list_id" property="overflowListId"/>
+        <result column="overflow_number" property="overflowNumber"/>
+        <result column="overflow_date" property="overflowDate"/>
+        <result column="remarks" property="remarks"/>
+        <result column="user_id" property="userId"/>
+        <result column="true_name" property="trueName"/>
+    </resultMap>
+
+    <insert id="insertOverflowList" useGeneratedKeys="true" keyProperty="overflowListId"  keyColumn="overflow_list_id">
+        insert into t_overflow_list
+        (overflow_number,overflow_date,remarks,user_id)
+        value (#{overflowNumber},#{overflowDate},#{remarks},#{userId})
+    </insert>
+
+    <select id="selectList" resultMap="OverflowListMap">
+        select tol.overflow_list_id,
+               tol.overflow_number,
+               tol.overflow_date,
+               tol.remarks,
+               tol.user_id,
+               tu.true_name
+        from t_overflow_list tol left join t_user tu on tol.user_id = tu.user_id
+        where tol.overflow_date between #{sTime} and #{eTime}
+    </select>
+</mapper>

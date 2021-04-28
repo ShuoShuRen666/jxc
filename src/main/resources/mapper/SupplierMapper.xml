@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.jxc.dao.SupplierDao">
+    <resultMap id="SupplierBaseMap" type="com.atguigu.jxc.entity.Supplier" autoMapping="true">
+        <id property="supplierId" column="supplier_id"/>
+        <result property="supplierName" column="supplier_name"/>
+        <result property="phoneNumber" column="phone_number"/>
+    </resultMap>
+
+    <insert id="save">
+        INSERT INTO t_supplier ( supplier_name, contacts, phone_number, address, remarks )
+        VALUES (#{supplierName},#{contacts},#{phoneNumber},#{address},#{remarks})
+    </insert>
+
+    <update id="updateById">
+        UPDATE t_supplier SET  supplier_name = #{supplierName},
+                              contacts = #{contacts},
+                              phone_number=#{phoneNumber},
+                              address=#{address},
+                              remarks=#{remarks}
+        where supplier_id = #{supplierId}
+    </update>
+
+    <delete id="deleteByIds">
+        delete from t_supplier
+        <where>
+            supplier_id in
+            <foreach collection="idArr" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+
+
+    <select id="getPageList" resultMap="SupplierBaseMap">
+        SELECT
+            ts.supplier_id,
+            ts.supplier_name,
+            ts.contacts,
+            ts.phone_number,
+            ts.address,
+            ts.remarks
+        FROM t_supplier ts
+        <where>
+            <if test="supplierName != null and supplierName != ''">
+                and ts.supplier_name like concat("%",#{supplierName},"%")
+            </if>
+        </where>
+        limit #{page},#{rows}
+    </select>
+
+    <select id="getSupplierCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM t_supplier
+        <where>
+            <if test="supplierName != null and supplierName != ''">
+                t_supplier.supplier_name like concat("%",#{supplierName},"%")
+            </if>
+        </where>
+    </select>
+
+</mapper>
